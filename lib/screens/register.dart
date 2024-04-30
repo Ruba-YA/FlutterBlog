@@ -36,13 +36,19 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  void _saveAndRedirectToHome(User user) async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    await pref.setString('token', user.token ?? '');
-    await pref.setInt('userId', user.id ?? 0);
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => Home()), (route) => false);
-  }
+void _saveAndRedirectToHome(User user) async {
+  print('User ID to save: ${user.id}');
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  await pref.setString('token', user.token ?? '');
+  await pref.setInt('user_id', user.id ?? 0);
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(builder: (context) => Home()),
+    (route) => false,
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
