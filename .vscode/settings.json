@@ -1,0 +1,6 @@
+{
+    "zenMode.hideStatusBar": false,
+    "editor.suggest.showStatusBar": true,
+    "debug.showInStatusBar": "always",
+    "workbench.statusBar.visible": true
+}
