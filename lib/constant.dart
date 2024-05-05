@@ -4,7 +4,7 @@
 // STRINGS
 import 'package:flutter/material.dart';
 
-const baseURL = "http://192.168.43.135:8000/api"; 
+const baseURL = "http://192.168.1.109:8000/api"; 
 const loginURL = baseURL + "/login";
 const registerURL = baseURL + "/register";
 const userURL = baseURL + "/user";

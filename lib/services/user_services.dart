@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_5/constant.dart';
 import 'package:flutter_application_5/models/api_response.dart';
@@ -129,3 +130,9 @@ Future<bool> logout() async {
 }
 
 
+
+// get base64 encoded image
+ String? getStringImage( File? file ){
+  if(file == null) return null ;
+  return base64Encode(file.readAsBytesSync());
+ }
