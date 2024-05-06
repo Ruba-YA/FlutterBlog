@@ -67,14 +67,14 @@ void _saveAndRedirectToHome(User user) async {
                 validator: (val) =>
                     val!.isEmpty ? "Invalid Name " : null,
                 keyboardType: TextInputType.emailAddress,
-                decoration: KInputDecoration('Name ')),
+                decoration: kInputDecoration('Name ')),
             SizedBox(height: 10),
             TextFormField(
                 controller: txtEmail,
                 validator: (val) =>
                     val!.isEmpty ? "Invalid email address " : null,
                 keyboardType: TextInputType.emailAddress,
-                decoration: KInputDecoration('Email')),
+                decoration: kInputDecoration('Email')),
             SizedBox(height: 10),
             TextFormField(
                 controller: txtPassword,
@@ -82,11 +82,11 @@ void _saveAndRedirectToHome(User user) async {
                     val!.length < 6 ? "Required at least 6 chars  " : null,
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
-                decoration: KInputDecoration('password')),
+                decoration: kInputDecoration('password')),
             SizedBox(height: 10),
             loading
                 ? Center(child: CircularProgressIndicator())
-                : KTextButton("Register", () {
+                : kTextButton("Register", () {
                     if (formkey.currentState!.validate()) {
                       setState(() {
                         loading = true;
@@ -95,7 +95,7 @@ void _saveAndRedirectToHome(User user) async {
                     }
                   }),
             SizedBox(height: 10),
-            KLoginRegisterHint("Already have an account?  ", "Login", () {
+            kLoginRegisterHint("Already have an account?  ", "Login", () {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => Login()),
                   (route) => false);

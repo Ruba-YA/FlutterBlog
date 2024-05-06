@@ -1,10 +1,10 @@
-//Home class
-import 'package:flutter/material.dart';
-import 'package:flutter_application_5/screens/login.dart';
-import 'package:flutter_application_5/screens/post_form.dart';
 import 'package:flutter_application_5/screens/post_screen.dart';
 import 'package:flutter_application_5/screens/profile.dart';
 import 'package:flutter_application_5/services/user_services.dart';
+import 'package:flutter/material.dart';
+
+import 'login.dart';
+import 'post_form.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,27 +12,30 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int currentIndex = 0 ; 
+  int currentIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Blog App'),
         actions: [
-          IconButton(onPressed: (){
- logout().then((value) => {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false)
-    });
-
-          }, icon: Icon(Icons.exit_to_app))
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: (){
+              logout().then((value) => {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false)
+              });
+            },
+          )
         ],
       ),
       body: currentIndex == 0 ? PostScreen() : Profile(),
-      floatingActionButton: FloatingActionButton(onPressed: () {
+       floatingActionButton: FloatingActionButton(onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>PostForm()), (route) => false);
 
       },
-      child: Icon(Icons.add),
+        child: Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
@@ -40,26 +43,25 @@ class _HomeState extends State<Home> {
         elevation: 10,
         clipBehavior: Clip.antiAlias,
         shape: CircularNotchedRectangle(),
-        child: 
-      BottomNavigationBar(items: [
-         BottomNavigationBarItem(icon: Icon(Icons.home),
-        label: 'Home'
+        child: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: ''
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: ''
+            )
+          ],
+          currentIndex: currentIndex,
+          onTap: (val) {
+            setState(() {
+              currentIndex = val;
+            });
+          },
         ),
-          BottomNavigationBarItem(icon: Icon(Icons.person),
-        label: 'Profile'
-        )
-      ],
-      currentIndex: currentIndex,
-      onTap: (value) {
-        setState(() {
-          currentIndex = value;
-        });
-      },
-      )),
-   
-
-
-
+      ),
     );
   }
 }

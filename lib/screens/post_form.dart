@@ -1,126 +1,153 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_application_5/constant.dart';
 import 'package:flutter_application_5/models/api_response.dart';
-import 'package:flutter_application_5/screens/home.dart';
-import 'package:flutter_application_5/screens/loading.dart';
-import 'package:flutter_application_5/screens/login.dart';
-import 'package:flutter_application_5/screens/post_screen.dart';
+import 'package:flutter_application_5/models/post.dart';
+import 'package:flutter_application_5/services/post_services.dart';
+import 'package:flutter_application_5/services/user_services.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../services/post_services.dart';
-import '../services/user_services.dart';
+import 'login.dart';
 
 class PostForm extends StatefulWidget {
-  const PostForm({super.key});
+  final Post? post;
+  final String? title;
+
+  PostForm({
+    this.post,
+    this.title
+  });
 
   @override
-  State<PostForm> createState() => _PostFormState();
+  _PostFormState createState() => _PostFormState();
 }
 
 class _PostFormState extends State<PostForm> {
-  final GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  TextEditingController textbody = TextEditingController();
-  bool loading = false ; 
-  File? imageFile;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _txtControllerBody = TextEditingController();
+  bool _loading = false;
+   File? _imageFile;
   final _picker = ImagePicker();
-  Future getImage() async{
+
+  Future getImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if(pickedFile != null)
-    {
+    if (pickedFile != null){
       setState(() {
-        imageFile = File(pickedFile.path);
+        _imageFile = File(pickedFile.path);
       });
     }
   }
 
-  void createPost() async{
-    String? image = imageFile == null ? null : getStringImage(imageFile);
-    ApiResponse response = await CreatePost(textbody.text , image);
-    if(response.error == null)
-    {
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>PostScreen()), (route) => false);
+  void _createPost() async {
+    String? image = _imageFile ==  null ? null : getStringImage(_imageFile);
+    ApiResponse response = await createPost(_txtControllerBody.text, image);
+
+    if(response.error ==  null) {
+      Navigator.of(context).pop();
     }
-    else if(response.error == unauthorized)
-    {
+    else if (response.error == unauthorized){
       logout().then((value) => {
         Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false)
       });
     }
-    else
-    {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${response.error}')));
+    else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${response.error}')
+      ));
       setState(() {
-        loading = !loading;
+        _loading = !_loading;
       });
     }
   }
+
+ // edit post
+  void _editPost(int postId) async {
+    ApiResponse response = await editPost(postId, _txtControllerBody.text);
+    if (response.error == null) {
+      Navigator.of(context).pop();
+    }
+    else if(response.error == unauthorized){
+      logout().then((value) => {
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false)
+      });
+    }
+    else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${response.error}')
+      ));
+      setState(() {
+        _loading = !_loading;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    if(widget.post != null){
+      _txtControllerBody.text = widget.post!.body ?? '';
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add New Post"),
-        actions: [
-          IconButton(onPressed: (){
-            setState(() {
-                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Home()), (route) => false);
-            });
-            
-          }, icon: Icon(Icons.exit_to_app))
-        ],
+        title: Text('${widget.title}'),
       ),
-      body: loading ? Center(child: CircularProgressIndicator(),) :  ListView(
+      body:_loading ? Center(child: CircularProgressIndicator(),) :  ListView(
         children: [
+          widget.post != null ? SizedBox() :
           Container(
             width: MediaQuery.of(context).size.width,
             height: 200,
             decoration: BoxDecoration(
-              image: imageFile == null ?null : DecorationImage(image: FileImage(imageFile ?? File('')),
-              fit: BoxFit.cover
+              image: _imageFile == null ? null : DecorationImage(
+                image: FileImage(_imageFile ?? File('')),
+                fit: BoxFit.cover
               )
             ),
             child: Center(
               child: IconButton(
-                  onPressed: () {
-                    getImage();
-                  },
-                  icon: Icon(
-                    Icons.image,
-                    size: 50,
-                    color: Colors.black87,
-                  )),
+                icon: Icon(Icons.image, size:50, color: Colors.black38),
+                onPressed: (){
+                  getImage();
+                },
+              ),
             ),
           ),
           Form(
-            key: formkey,
-            child: Padding(padding: EdgeInsets.all(8),
-            child: TextFormField(
-              controller: textbody,
-              keyboardType: TextInputType.multiline,
-              maxLines: 9,
-              maxLength: 90,
-              validator: (val)=>val!.isEmpty ? " Post body is required ":null,
-              decoration: InputDecoration(
-                hintText: 'Post body ..',
-                border: OutlineInputBorder(borderSide: BorderSide(width: 1 , color: Colors.black38))
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: TextFormField(
+                controller: _txtControllerBody,
+                keyboardType: TextInputType.multiline,
+                maxLines: 9,
+                validator: (val) => val!.isEmpty ? 'Post body is required' : null,
+                decoration: InputDecoration(
+                  hintText: "Post body...",
+                  border: OutlineInputBorder(borderSide: BorderSide(width: 1, color: Colors.black38))
+                ),
               ),
             ),
-            
-            ),
-
           ),
-          Padding(padding: EdgeInsets.symmetric(horizontal: 8),
-          child: KTextButton('Post', (){
-             if(formkey . currentState!.validate()){
-            setState(() {
-             loading = !loading;
-            });
-            createPost();
-             }
-          }),
-          ),
-
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: kTextButton('Post', (){
+              if (_formKey.currentState!.validate()){
+                setState(() {
+                  _loading = !_loading;
+                });
+                if (widget.post == null) {
+                  _createPost();
+                } else {
+                  _editPost(widget.post!.id ?? 0);
+                }
+              }
+            }),
+          )
         ],
       ),
     );

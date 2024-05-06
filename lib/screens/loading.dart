@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_application_5/constant.dart';
 import 'package:flutter_application_5/models/api_response.dart';
-import 'package:flutter_application_5/screens/login.dart';
+import 'package:flutter_application_5/screens/home.dart';
 import 'package:flutter_application_5/services/user_services.dart';
-import 'package:path/path.dart';
+import 'package:flutter/material.dart';
 
-import '../constant.dart';
-import 'home.dart';
+import 'login.dart';
+
+
 class Loading extends StatefulWidget {
   @override
   _LoadingState createState() => _LoadingState();
@@ -15,37 +15,40 @@ class Loading extends StatefulWidget {
 class _LoadingState extends State<Loading> {
 
   void _loadUserInfo() async {
-    String token = await getToken(); 
-    if (token == '') {
-      
-      Navigator.of(context as BuildContext).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false);
+    String token = await getToken();
+    if(token == ''){
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false);
     }
     else {
       ApiResponse response = await getUserDetail();
-      if(response.error == null) {
-        Navigator.of(context as BuildContext).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Home()), (route) => false);
+      if (response.error == null){
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Home()), (route) => false);
       }
-      else if(response.error == unauthorized) {
-        Navigator.of(context as BuildContext).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false);
+      else if (response.error == unauthorized){
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=>Login()), (route) => false);
       }
-      else{
-        ScaffoldMessenger.of(context as BuildContext).showSnackBar(SnackBar(content: Text('${response.error}'),));
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('${response.error}'),
+        ));
       }
     }
   }
- @override
+
+  @override
   void initState() {
-    // TODO: implement initState
     _loadUserInfo();
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
       height: MediaQuery.of(context).size.height,
-      child: Center(child: CircularProgressIndicator()),
+      color: Colors.white,
+      child: Center(
+        child: CircularProgressIndicator()
+      ),
     );
   }
 }
